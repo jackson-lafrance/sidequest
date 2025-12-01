@@ -5,9 +5,8 @@ import QuestDetails from '../views/Main/QuestDetails'
 import Profile from '../views/Main/Profile'
 import Settings from '../views/Main/Settings'
 import Login from '../views/Auth/Login'
-import Signup from '../views/Auth/Signup'
 
-export type RouteKey = 'home' | 'createQuest' | 'questDetails' | 'profile' | 'settings' | 'login' | 'signup'
+export type RouteKey = 'home' | 'createQuest' | 'questDetails' | 'profile' | 'settings' | 'login'
 
 export const routes: Record<RouteKey, RouteKey> = {
     home: 'home',
@@ -16,7 +15,6 @@ export const routes: Record<RouteKey, RouteKey> = {
     profile: 'profile',
     settings: 'settings',
     login: 'login',
-    signup: 'signup',
 }
 
 const routeComponents: Record<RouteKey, React.ComponentType> = {
@@ -26,7 +24,6 @@ const routeComponents: Record<RouteKey, React.ComponentType> = {
     profile: Profile,
     settings: Settings,
     login: Login,
-    signup: Signup,
 }
 
 export const getRouteComponent = (route: RouteKey): ReactNode => {

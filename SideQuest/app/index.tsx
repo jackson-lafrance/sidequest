@@ -19,10 +19,10 @@ export default function Index() {
   }, [onAuthChange]);
 
   useEffect(() => {
-    if (!currentUser && route !== routes.login && route !== routes.signup) {
+    if (!currentUser && route !== routes.login) {
       setRoute(routes.login);
     }
-  }, [currentUser, setRoute, routes.login, routes.signup, route]);
+  }, [currentUser, setRoute, routes.login, route]);
 
   const mainTabs = [
     { icon: "home" as const, route: routes.home },
