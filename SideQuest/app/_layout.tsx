@@ -5,7 +5,12 @@ import { initializeFirebase } from "../core/firebase";
 
 export default function RootLayout() {
   useEffect(() => {
-    initializeFirebase();
+    try {
+      initializeFirebase();
+    } catch (error) {
+      console.error("Failed to initialize Firebase:", error);
+
+    }
   }, []);
 
   return (
