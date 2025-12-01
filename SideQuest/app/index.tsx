@@ -35,9 +35,10 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {getRouteComponent(route)}
+      {currentUser && (
       <View style={styles.bottomTabBar}> 
         <BottomTabBar tabs={mainTabs} setRoute={setRoute} route={route} />
-      </View>
+      </View>)}
     </View>
   );
 }
