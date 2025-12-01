@@ -1,13 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation, getRouteComponent } from "../core/useNavigation";
 import BottomTabBar from "../components/navigation/bottomTabBar";
 import { View, StyleSheet } from "react-native";
 import useFirebase from "../core/useFirebase";
+import { User } from "firebase/auth";
 
 export default function Index() {
   const { route, setRoute, routes } = useNavigation();
-  const { getCurrentUser } = useFirebase();
-  const currentUser = getCurrentUser();
+  const { onAuthChange } = useFirebase();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthChange((user) => {
+      setCurrentUser(user);
+    });
+
+    return () => unsubscribe();
+  }, [onAuthChange]);
 
   useEffect(() => {
     if (!currentUser && route !== routes.login && route !== routes.signup) {
