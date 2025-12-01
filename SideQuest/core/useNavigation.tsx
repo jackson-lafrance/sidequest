@@ -36,8 +36,8 @@ interface NavigationProviderProps {
 }
 
 export default function NavigationProvider({ children }: NavigationProviderProps) {
-    const [loggedIn, setLoggedIn] = useState(true)
-    const [route, setRoute] = useState<Route>(Route.HOME)
+    const [loggedIn, setLoggedIn] = useState(false)
+    const [route, setRoute] = useState<Route>(Route.LOGIN)
 
     
     useEffect(() => {
