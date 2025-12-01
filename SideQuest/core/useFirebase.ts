@@ -20,7 +20,7 @@ import {
 } from 'firebase/firestore';
 import { getFirebaseAuth, getFirestoreDb } from './firebase';
 
-export const signIn = async (email: string, password: string): Promise<UserCredential> => {
+const signIn = async (email: string, password: string): Promise<UserCredential> => {
   const auth = getFirebaseAuth();
   return signInWithEmailAndPassword(auth, email, password);
 };
@@ -40,12 +40,12 @@ export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };
 
-export const onAuthChange = (callback: (user: User | null) => void) => {
+const onAuthChange = (callback: (user: User | null) => void) => {
   const auth = getFirebaseAuth();
   return onAuthStateChanged(auth, callback);
 };
 
-export const createDocument = async <T extends Record<string, any>>(
+ const createDocument = async <T extends Record<string, any>>(
   collectionName: string,
   data: T,
   documentId?: string
@@ -63,7 +63,7 @@ export const createDocument = async <T extends Record<string, any>>(
   }
 };
 
-export const getDocument = async <T>(collectionName: string, documentId: string): Promise<T | null> => {
+const getDocument = async <T>(collectionName: string, documentId: string): Promise<T | null> => {
   const db = getFirestoreDb();
   const docRef = doc(db, collectionName, documentId);
   const docSnap = await getDoc(docRef);
@@ -75,7 +75,7 @@ export const getDocument = async <T>(collectionName: string, documentId: string)
   return null;
 };
 
-export const updateDocument = async <T extends Record<string, any>>(
+const updateDocument = async <T extends Record<string, any>>(
   collectionName: string,
   documentId: string,
   data: Partial<T>
@@ -85,13 +85,13 @@ export const updateDocument = async <T extends Record<string, any>>(
   await updateDoc(docRef, data as any);
 };
 
-export const deleteDocument = async (collectionName: string, documentId: string): Promise<void> => {
+const deleteDocument = async (collectionName: string, documentId: string): Promise<void> => {
   const db = getFirestoreDb();
   const docRef = doc(db, collectionName, documentId);
   await deleteDoc(docRef);
 };
 
-export const queryDocuments = async <T>(
+const queryDocuments = async <T>(
   collectionName: string,
   field: string,
   operator: any,
@@ -108,3 +108,18 @@ export const queryDocuments = async <T>(
   })) as T[];
 };
 
+
+export default function useFirebase() {
+  return {
+    signIn,
+    signUp,
+    logout,
+    getCurrentUser,
+    onAuthChange,
+    createDocument,
+    getDocument,
+    updateDocument,
+    deleteDocument,
+    queryDocuments,
+  }
+}

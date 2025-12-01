@@ -1,15 +1,14 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { RouteKey } from '../../core/useNavigation';
 
 interface Props {
     tabs: {
         icon: keyof typeof Ionicons.glyphMap;
-        route: RouteKey;
+        route: ReactNode;
     }[];
-    setRoute: (route: RouteKey) => void;
-    route: RouteKey;
+    setRoute: (route: ReactNode) => void;
+    route: ReactNode;
 }
 
 export default function BottomTabBar({ tabs, setRoute, route }: Props) {
