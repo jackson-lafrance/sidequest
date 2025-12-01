@@ -46,7 +46,8 @@ export default function NavigationProvider({ children }: NavigationProviderProps
         } else if (!loggedIn && route !== Route.LOGIN && route !== Route.SIGNUP) {
             setRoute(Route.LOGIN)
         }
-    }, [loggedIn, route])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loggedIn]) 
     
     const login = () => {
         setLoggedIn(true)
