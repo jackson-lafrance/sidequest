@@ -1,72 +1,49 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
+import React, { createContext, useContext, useState, ReactNode } from 'react'
+import Home from '../views/Main/Home'
+import CreateQuest from '../views/Main/CreateQuest'
+import QuestDetails from '../views/Main/QuestDetails'
+import Profile from '../views/Main/Profile'
+import Settings from '../views/Main/Settings'
+import Login from '../views/Auth/Login'
+import Signup from '../views/Auth/Signup'
 
-export enum Route {
-    HOME,
-    CREATE_QUEST,
-    QUEST_DETAILS,
-    PROFILE,
-    SETTINGS,
-    LOGIN,
-    SIGNUP,
+const routes = {
+    home: <Home />,
+    createQuest: <CreateQuest />,
+    questDetails: <QuestDetails />,
+    profile: <Profile />,
+    settings: <Settings />,
+    login: <Login />,
+    signup: <Signup />,
 }
 
-
 interface ContextType {
-    route: Route
-    loggedIn: boolean
-    setRoute: (route: Route) => void
-    setLoggedIn: (loggedIn: boolean) => void
-    login: () => void
-    logout: () => void
+    route: ReactNode
+    setRoute: (route: ReactNode) => void,
+    routes: Record<string, ReactNode>,
 }
 
 const defaultContext: ContextType = {
-    route: Route.LOGIN,
-    loggedIn: false,
+    route: <></>,
     setRoute: () => {},
-    setLoggedIn: () => {},
-    login: () => {},
-    logout: () => {},
+    routes: {},
 }
 
 const NavigationContext = createContext<ContextType>(defaultContext)
 
-interface NavigationProviderProps {
+interface Props {
     children: ReactNode
 }
 
-export default function NavigationProvider({ children }: NavigationProviderProps) {
-    const [loggedIn, setLoggedIn] = useState(false)
-    const [route, setRoute] = useState<Route>(Route.LOGIN)
+export default function NavigationProvider({ children }: Props) {
+    const [route, setRoute] = useState<ReactNode>(routes.home)
 
-    
-    useEffect(() => {
-        if (loggedIn && (route === Route.LOGIN || route === Route.SIGNUP)) {
-            setRoute(Route.HOME)
-        } else if (!loggedIn && route !== Route.LOGIN && route !== Route.SIGNUP) {
-            setRoute(Route.LOGIN)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loggedIn]) 
-    
-    const login = () => {
-        setLoggedIn(true)
-        setRoute(Route.HOME)
-    }
-    
-    const logout = () => {
-        setLoggedIn(false)
-        setRoute(Route.LOGIN)
-    }
 
     return (
         <NavigationContext.Provider value={{
             route,
-            loggedIn,
             setRoute,
-            setLoggedIn,
-            login,
-            logout,
+            routes,
         }}>
             {children}
         </NavigationContext.Provider>

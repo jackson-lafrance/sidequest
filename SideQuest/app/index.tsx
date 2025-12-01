@@ -1,29 +1,25 @@
-import { useNavigation, Route } from "../core/useNavigation";
+import React from "react";
+import { useNavigation } from "../core/useNavigation";
 import BottomTabBar from "../components/navigation/bottomTabBar";
 import { View, StyleSheet } from "react-native";
-import { routes } from "../core/routes";
 
 export default function Index() {
-  const { loggedIn, route } = useNavigation();
-  const CurrentComponent = routes[route];
+  const { route, routes, setRoute } = useNavigation();
   
   const mainTabs = [
-    { icon: "home" as const, route: Route.HOME },
-    { icon: "person" as const, route: Route.PROFILE },
-    { icon: "create" as const, route: Route.CREATE_QUEST },
-    { icon: "document" as const, route: Route.QUEST_DETAILS },
-    { icon: "settings" as const, route: Route.SETTINGS },
+    { icon: "home" as const, route: routes.home },
+    { icon: "person" as const, route: routes.profile },
+    { icon: "create" as const, route: routes.createQuest },
+    { icon: "document" as const, route: routes.questDetails },
+    { icon: "settings" as const, route: routes.settings },
   ];
 
   return (
     <View style={styles.container}>
-      {CurrentComponent && <CurrentComponent />}
-      
-      {loggedIn && (
-        <View style={styles.bottomTabBar}> 
-          <BottomTabBar tabs={mainTabs} />
-        </View>
-      )}
+      {route}
+      <View style={styles.bottomTabBar}> 
+        <BottomTabBar tabs={mainTabs} setRoute={setRoute} route={route} />
+      </View>
     </View>
   );
 }

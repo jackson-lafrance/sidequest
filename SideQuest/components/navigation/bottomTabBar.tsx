@@ -1,35 +1,31 @@
+import React, { ReactNode } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import { useNavigation, Route } from '../../core/useNavigation';
 import { Ionicons } from '@expo/vector-icons';
 
-export interface TabItem {
-    icon: keyof typeof Ionicons.glyphMap;
-    route: Route;
+interface Props {
+    tabs: {
+        icon: keyof typeof Ionicons.glyphMap;
+        route: ReactNode;
+    }[];
+    setRoute: (route: ReactNode) => void;
+    route: ReactNode;
 }
 
-interface BottomTabBarProps {
-    tabs: TabItem[];
-}
-
-export default function BottomTabBar({ tabs }: BottomTabBarProps) {
-    const { route, setRoute } = useNavigation();
-
+export default function BottomTabBar({ tabs, setRoute, route }: Props) {
     return (
         <View style={styles.container}>
             {tabs.map((tab, index) => {
-                const isActive = route === tab.route;
                 return (
                     <Pressable
-                        key={index}
-                        style={[styles.tab]}
+                        key={index} 
+                        style={styles.tab}
                         onPress={() => setRoute(tab.route)}
                     >
                         <Ionicons
                             name={tab.icon}
                             size={24}
-                            color={isActive ? '#007AFF' : '#8E8E93'}
-                        />
-                        
+                            color={route === tab.route ? '#007AFF' : '#8E8E93'}
+                        />                        
                     </Pressable>
                 );
             })}
@@ -52,14 +48,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 8,
-    },
-    label: {
-        fontSize: 10,
-        color: '#8E8E93',
-        marginTop: 4,
-    },
-    activeLabel: {
-        color: '#007AFF',
     },
 });
 
