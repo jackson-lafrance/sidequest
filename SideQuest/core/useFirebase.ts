@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from 'react';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -40,10 +41,6 @@ export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };
 
-const onAuthChange = (callback: (user: User | null) => void) => {
-  const auth = getFirebaseAuth();
-  return onAuthStateChanged(auth, callback);
-};
 
  const createDocument = async <T extends Record<string, any>>(
   collectionName: string,
@@ -110,7 +107,12 @@ const queryDocuments = async <T>(
 
 
 export default function useFirebase() {
-  return {
+  const onAuthChange = useCallback((callback: (user: User | null) => void) => {
+    const auth = getFirebaseAuth();
+    return onAuthStateChanged(auth, callback);
+  }, []);
+
+  return useMemo(() => ({
     signIn,
     signUp,
     logout,
@@ -121,5 +123,5 @@ export default function useFirebase() {
     updateDocument,
     deleteDocument,
     queryDocuments,
-  }
+  }), [onAuthChange]);
 }
