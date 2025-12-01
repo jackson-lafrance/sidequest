@@ -1,6 +1,8 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+// @ts-ignore: getReactNativePersistence exists in the React Native bundle but is missing from TypeScript definitions.
+import { initializeAuth, getReactNativePersistence, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirebaseConfig } from './config';
 
 let app: FirebaseApp | undefined;
@@ -26,7 +28,9 @@ export const getFirebaseAuth = (): Auth => {
   }
   
   if (!auth) {
-    auth = getAuth(app);
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+    });
   }
   
   return auth;
