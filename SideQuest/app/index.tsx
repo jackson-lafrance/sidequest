@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigation } from "../core/useNavigation";
+import { useNavigation, getRouteComponent } from "../core/useNavigation";
 import BottomTabBar from "../components/navigation/bottomTabBar";
 import { View, StyleSheet } from "react-native";
 import useFirebase from "../core/useFirebase";
@@ -25,7 +25,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {route}
+      {getRouteComponent(route)}
       <View style={styles.bottomTabBar}> 
         <BottomTabBar tabs={mainTabs} setRoute={setRoute} route={route} />
       </View>

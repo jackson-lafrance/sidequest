@@ -7,20 +7,36 @@ import Settings from '../views/Main/Settings'
 import Login from '../views/Auth/Login'
 import Signup from '../views/Auth/Signup'
 
+export type RouteKey = 'home' | 'createQuest' | 'questDetails' | 'profile' | 'settings' | 'login' | 'signup'
 
-const routes = {
-    home: <Home />,
-    createQuest: <CreateQuest />,
-    questDetails: <QuestDetails />,
-    profile: <Profile />,
-    settings: <Settings />,
-    login: <Login />,
-    signup: <Signup />,
+export const routes: Record<RouteKey, RouteKey> = {
+    home: 'home',
+    createQuest: 'createQuest',
+    questDetails: 'questDetails',
+    profile: 'profile',
+    settings: 'settings',
+    login: 'login',
+    signup: 'signup',
+}
+
+const routeComponents: Record<RouteKey, React.ComponentType> = {
+    home: Home,
+    createQuest: CreateQuest,
+    questDetails: QuestDetails,
+    profile: Profile,
+    settings: Settings,
+    login: Login,
+    signup: Signup,
+}
+
+export const getRouteComponent = (route: RouteKey): ReactNode => {
+    const Component = routeComponents[route]
+    return Component ? <Component /> : null
 }
 
 interface ContextType {
-    route: ReactNode
-    setRoute: Dispatch<SetStateAction<ReactNode>>,
+    route: RouteKey
+    setRoute: Dispatch<SetStateAction<RouteKey>>,
     routes: typeof routes,
 }
 
@@ -39,7 +55,7 @@ interface Props {
 
 export default function NavigationProvider({ children }: Props) {
     
-    const [route, setRoute] = useState<ReactNode>(routes.home)
+    const [route, setRoute] = useState<RouteKey>(routes.home)
 
     return (
         <NavigationContext.Provider value={{
