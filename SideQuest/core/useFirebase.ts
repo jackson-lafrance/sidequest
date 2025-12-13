@@ -18,10 +18,29 @@ import {
   where,
   getDocs,
   addDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { getFirebaseAuth, getFirestoreDb } from './firebase';
 import { Alert } from 'react-native';
 
+
+export interface UserType {
+  id: string;
+  email: string;
+  displayName: string;
+  createdAt: Timestamp;
+  level: number;
+  currentXp: number;
+}
+
+export interface QuestType {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  totalQuestXp: number;
+  status: 'active' | 'completed';
+}
 
 const signIn = async (email: string, password: string): Promise<UserCredential | null> => {
   const auth = getFirebaseAuth();
@@ -33,11 +52,26 @@ const signIn = async (email: string, password: string): Promise<UserCredential |
   }
 };
 
+export const addXp = async (userId: string, xp: number): Promise<void> => {
+  const user = await getDocument<UserType>('users', userId);
+  if (!user) {
+    return;
+  }
+  const { currentXp, level } = user;
+  const maxXp = level * 100;
+  if (currentXp + xp >= maxXp) {
+    const overflow = (currentXp + xp) - maxXp;
+    await updateDocument('users', userId, { level: level + 1, currentXp: overflow });
+  } else {
+    await updateDocument('users', userId, { currentXp: currentXp + xp });
+  }
+};
+
 export const signUp = async (email: string, password: string, displayName: string): Promise<UserCredential | null> => {
   const auth = getFirebaseAuth();
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await createDocument('users', { email, displayName, createdAt: new Date(), level: 1, currentXp: 0, totalXp: 0 }, userCredential.user.uid);
+    await createDocument('users', { email, displayName, createdAt: Timestamp.now(), level: 1, currentXp: 0 }, userCredential.user.uid);
     return userCredential;
   } catch (error) {
     Alert.alert('Sign up failed', (error as Error).message);
@@ -50,9 +84,13 @@ export const logout = async (): Promise<void> => {
   return signOut(auth);
 };
 
-export const getCurrentUser = (): User | null => {
+export const getCurrentUser = async (): Promise<UserType | null> => {
   const auth = getFirebaseAuth();
-  return auth.currentUser;
+  const user = await getDocument<UserType>('users', auth.currentUser?.uid as string);
+  if (user) {
+    return user;
+  }
+  return null;
 };
 
 
@@ -119,6 +157,13 @@ const queryDocuments = async <T>(
   })) as T[];
 };
 
+export const createQuest = async (userId: string, title: string, description: string, totalQuestXp: number) => {
+  await createDocument('quests', { userId, title, description, totalQuestXp, status: 'active', createdAt: Timestamp.now(), completedAt: null });
+};
+
+export const getQuests = async (userId: string): Promise<QuestType[]> => {
+  return await queryDocuments<QuestType>('quests', 'userId', '==', userId);
+};
 
 export default function useFirebase() {
   const onAuthChange = useCallback((callback: (user: User | null) => void) => {
