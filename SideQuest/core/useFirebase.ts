@@ -40,6 +40,8 @@ export interface QuestType {
   description: string;
   totalQuestXp: number;
   status: 'active' | 'completed';
+  createdAt: Timestamp;
+  completedAt: Timestamp | null;
 }
 
 const signIn = async (email: string, password: string): Promise<UserCredential | null> => {
@@ -86,11 +88,10 @@ export const logout = async (): Promise<void> => {
 
 export const getCurrentUser = async (): Promise<UserType | null> => {
   const auth = getFirebaseAuth();
-  const user = await getDocument<UserType>('users', auth.currentUser?.uid as string);
-  if (user) {
-    return user;
+  if (!auth.currentUser?.uid) {
+    return null;
   }
-  return null;
+  return await getDocument<UserType>('users', auth.currentUser.uid);
 };
 
 
@@ -165,6 +166,10 @@ export const getQuests = async (userId: string): Promise<QuestType[]> => {
   return await queryDocuments<QuestType>('quests', 'userId', '==', userId);
 };
 
+export const completeQuest = async (questId: string) => {
+  await updateDocument('quests', questId, { status: 'completed', completedAt: Timestamp.now() });
+};
+
 export default function useFirebase() {
   const onAuthChange = useCallback((callback: (user: User | null) => void) => {
     const auth = getFirebaseAuth();
@@ -182,5 +187,6 @@ export default function useFirebase() {
     updateDocument,
     deleteDocument,
     queryDocuments,
+    completeQuest,
   }), [onAuthChange]);
 }

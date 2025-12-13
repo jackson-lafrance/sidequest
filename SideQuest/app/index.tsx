@@ -6,7 +6,7 @@ import useFirebase from "../core/useFirebase";
 import { User } from "firebase/auth";
 
 export default function Index() {
-  const { route, setRoute, routes } = useNavigation();
+  const { route, routeProps, setRoute, routes } = useNavigation();
   const { onAuthChange } = useFirebase();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
@@ -34,7 +34,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {getRouteComponent(route)}
+      {getRouteComponent(route, routeProps)}
       {currentUser && (
       <View style={styles.bottomTabBar}> 
         <BottomTabBar tabs={mainTabs} setRoute={setRoute} route={route} />

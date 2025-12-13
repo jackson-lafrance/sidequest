@@ -1,14 +1,14 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { RouteKey } from '../../core/useNavigation';
+import { RouteKey, RouteProps } from '../../core/useNavigation';
 
 interface Props {
     tabs: {
         icon: keyof typeof Ionicons.glyphMap;
         route: RouteKey;
     }[];
-    setRoute: Dispatch<SetStateAction<RouteKey>>;
+    setRoute: (route: RouteKey, props?: RouteProps) => void;
     route: RouteKey;
 }
 

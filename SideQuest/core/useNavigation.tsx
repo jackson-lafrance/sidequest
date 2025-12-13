@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'
 import Home from '../views/Main/Home'
 import CreateQuest from '../views/Main/CreateQuest'
 import QuestDetails from '../views/Main/QuestDetails'
@@ -7,6 +7,8 @@ import Settings from '../views/Main/Settings'
 import Login from '../views/Auth/Login'
 
 export type RouteKey = 'home' | 'createQuest' | 'questDetails' | 'profile' | 'settings' | 'login'
+
+export type RouteProps = Record<string, any> | null
 
 export const routes: Record<RouteKey, RouteKey> = {
     home: 'home',
@@ -17,7 +19,7 @@ export const routes: Record<RouteKey, RouteKey> = {
     login: 'login',
 }
 
-const routeComponents: Record<RouteKey, React.ComponentType> = {
+const routeComponents: Record<RouteKey, React.ComponentType<any>> = {
     home: Home,
     createQuest: CreateQuest,
     questDetails: QuestDetails,
@@ -26,21 +28,22 @@ const routeComponents: Record<RouteKey, React.ComponentType> = {
     login: Login,
 }
 
-export const getRouteComponent = (route: RouteKey): ReactNode => {
+export const getRouteComponent = (route: RouteKey, props: RouteProps): ReactNode => {
     const Component = routeComponents[route]
-    return Component ? <Component /> : null
+    return Component ? <Component {...props} /> : null
 }
 
 interface ContextType {
     route: RouteKey
-    setRoute: Dispatch<SetStateAction<RouteKey>>,
-    routes: typeof routes,
+    routeProps: RouteProps
+    setRoute: (route: RouteKey, props?: RouteProps) => void
+    routes: typeof routes
 }
 
 const defaultContext: ContextType = {
     route: routes.home,
-    setRoute: () => {
-    },
+    routeProps: null,
+    setRoute: () => {},
     routes,
 }
 
@@ -51,12 +54,18 @@ interface Props {
 }
 
 export default function NavigationProvider({ children }: Props) {
-    
-    const [route, setRoute] = useState<RouteKey>(routes.home)
+    const [route, setRouteState] = useState<RouteKey>(routes.home)
+    const [routeProps, setRouteProps] = useState<RouteProps>(null)
+
+    const setRoute = useCallback((newRoute: RouteKey, props?: RouteProps) => {
+        setRouteState(newRoute)
+        setRouteProps(props ?? null)
+    }, [])
 
     return (
         <NavigationContext.Provider value={{
             route,
+            routeProps,
             setRoute,
             routes,
         }}>
