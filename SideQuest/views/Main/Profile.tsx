@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, ScrollView, Text, View } from "react-native";
 import useFirebase, { UserType, addXp } from "@/core/useFirebase";
 import XpBar from "@/components/xpBar";
 
@@ -31,7 +31,7 @@ export default function Profile() {
     }
 
     return (
-        <View>
+        <ScrollView style={{ flex: 1 }}>
             <Text>Profile</Text>
             <Text>Email: {currentUser.email}</Text>
             <Text>Username: {currentUser.displayName}</Text>
@@ -40,7 +40,7 @@ export default function Profile() {
             <Text>Current XP: {currentUser.currentXp}</Text>
             <XpBar xp={currentUser.currentXp} maxXp={currentUser.level * 100} />
             <Button title="Add XP" onPress={handleAddXp} />
-        </View>
+        </ScrollView>
     )
 }
 

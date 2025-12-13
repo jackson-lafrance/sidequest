@@ -1,6 +1,6 @@
-import { Button, FlatList, Text, View } from "react-native";
+import { Button, FlatList, View } from "react-native";
 import useFirebase, { QuestType, UserType, getQuests } from "@/core/useFirebase";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { routes, useNavigation } from "@/core/useNavigation";
 
 export default function Home() {
@@ -8,22 +8,24 @@ export default function Home() {
     const { setRoute } = useNavigation();
     const [currentUser, setCurrentUser] = useState<UserType | null>(null);
     const [quests, setQuests] = useState<QuestType[]>([]);
-    const refreshQuests = useCallback(async () => {
-        if (!currentUser) return;
-        const quests = await getQuests(currentUser.id);
-        setQuests(quests);
-    }, [currentUser]);
+
     useEffect(() => {
-        const refreshUser = async () => {
-            const user = await getCurrentUser();
-            setCurrentUser(user);
-            refreshQuests();
-        };
-        refreshUser();
-    }, [getCurrentUser, refreshQuests]);
+        getCurrentUser().then(setCurrentUser);
+    }, [getCurrentUser]);
+
+    useEffect(() => {
+        if (!currentUser) return;
+        getQuests(currentUser.id).then(setQuests);
+    }, [currentUser]);
     return (
-        <View>
-            <FlatList data={quests} renderItem={({ item }: { item: QuestType }) => <Button title={item.title} onPress={() => setRoute(routes.questDetails, { quest: item })} />} />
+        <View style={{ flex: 1 }}>
+            <FlatList 
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 100 }}
+                data={quests} 
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }: { item: QuestType }) => <Button title={item.title} onPress={() => setRoute(routes.questDetails, { quest: item })} />} 
+            />
         </View>
     )
 }

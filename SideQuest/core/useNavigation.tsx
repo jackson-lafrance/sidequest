@@ -1,18 +1,20 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react'
 import Home from '../views/Main/Home'
 import CreateQuest from '../views/Main/CreateQuest'
+import CreateSidequest from '../views/Main/CreateSidequest'
 import QuestDetails from '../views/Main/QuestDetails'
 import Profile from '../views/Main/Profile'
 import Settings from '../views/Main/Settings'
 import Login from '../views/Auth/Login'
 
-export type RouteKey = 'home' | 'createQuest' | 'questDetails' | 'profile' | 'settings' | 'login'
+export type RouteKey = 'home' | 'createQuest' | 'createSidequest' | 'questDetails' | 'profile' | 'settings' | 'login'
 
 export type RouteProps = Record<string, any> | null
 
 export const routes: Record<RouteKey, RouteKey> = {
     home: 'home',
     createQuest: 'createQuest',
+    createSidequest: 'createSidequest',
     questDetails: 'questDetails',
     profile: 'profile',
     settings: 'settings',
@@ -22,6 +24,7 @@ export const routes: Record<RouteKey, RouteKey> = {
 const routeComponents: Record<RouteKey, React.ComponentType<any>> = {
     home: Home,
     createQuest: CreateQuest,
+    createSidequest: CreateSidequest,
     questDetails: QuestDetails,
     profile: Profile,
     settings: Settings,

@@ -1,7 +1,8 @@
 import useFirebase, { UserType, createQuest } from "@/core/useFirebase";
 import { routes, useNavigation } from "@/core/useNavigation";
 import React, { useEffect, useState } from "react";
-import { Button, Text, TextInput, View } from "react-native";
+import { Alert, Button, ScrollView, Text, TextInput } from "react-native";
+import * as Crypto from "expo-crypto";
 
 export default function CreateQuest() {
     const { getCurrentUser } = useFirebase();
@@ -20,20 +21,25 @@ export default function CreateQuest() {
     }, [getCurrentUser]);
     const handleCreateQuest = async () => {
         if (!currentUser) return;
-        await createQuest(currentUser.id, title, description, totalQuestXp);
-        setTitle('');
-        setDescription('');
-        setTotalQuestXp(0);
-        setRoute(routes.home);
+        try {
+            const newQuest = await createQuest(currentUser.id, title, description, totalQuestXp, Crypto.randomUUID());
+            setTitle('');
+            setDescription('');
+            setTotalQuestXp(0);
+            setRoute(routes.questDetails, { quest: newQuest });
+        } catch (error) {
+            Alert.alert('Error', 'Failed to create quest. Check Firebase rules.');
+            console.error('Failed to create quest:', error);
+        }
     };
     return (
-        <View>
+        <ScrollView style={{ flex: 1 }}>
             <Text>CreateQuest</Text>
             <TextInput placeholder="Title" value={title} onChangeText={setTitle} />
             <TextInput placeholder="Description" value={description} onChangeText={setDescription} />
             <TextInput placeholder="Total Quest XP" value={totalQuestXp.toString()} onChangeText={(text) => setTotalQuestXp(Number(text))} />
             <Button title="Create Quest" onPress={handleCreateQuest} />
-        </View>
+        </ScrollView>
     )
 }
 

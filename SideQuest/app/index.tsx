@@ -28,7 +28,6 @@ export default function Index() {
     { icon: "home" as const, route: routes.home },
     { icon: "person" as const, route: routes.profile },
     { icon: "create" as const, route: routes.createQuest },
-    { icon: "document" as const, route: routes.questDetails },
     { icon: "settings" as const, route: routes.settings },
   ];
 

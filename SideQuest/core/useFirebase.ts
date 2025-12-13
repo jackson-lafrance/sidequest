@@ -42,6 +42,17 @@ export interface QuestType {
   status: 'active' | 'completed';
   createdAt: Timestamp;
   completedAt: Timestamp | null;
+  sidequestsIds: string[];
+}
+
+export interface SidequestType {
+  id: string;
+  questId: string;
+  title: string;
+  description: string;
+  totalSidequestXp: number;
+  isCompleted: boolean;
+  orderIndex: number;
 }
 
 const signIn = async (email: string, password: string): Promise<UserCredential | null> => {
@@ -59,14 +70,18 @@ export const addXp = async (userId: string, xp: number): Promise<void> => {
   if (!user) {
     return;
   }
-  const { currentXp, level } = user;
-  const maxXp = level * 100;
-  if (currentXp + xp >= maxXp) {
-    const overflow = (currentXp + xp) - maxXp;
-    await updateDocument('users', userId, { level: level + 1, currentXp: overflow });
-  } else {
-    await updateDocument('users', userId, { currentXp: currentXp + xp });
+  let { currentXp, level } = user;
+  currentXp += xp;
+  
+  // Keep leveling up while XP exceeds max for current level
+  let maxXp = level * 100;
+  while (currentXp >= maxXp) {
+    currentXp -= maxXp;
+    level += 1;
+    maxXp = level * 100;
   }
+  
+  await updateDocument('users', userId, { level, currentXp });
 };
 
 export const signUp = async (email: string, password: string, displayName: string): Promise<UserCredential | null> => {
@@ -158,16 +173,84 @@ const queryDocuments = async <T>(
   })) as T[];
 };
 
-export const createQuest = async (userId: string, title: string, description: string, totalQuestXp: number) => {
-  await createDocument('quests', { userId, title, description, totalQuestXp, status: 'active', createdAt: Timestamp.now(), completedAt: null });
+export const createQuest = async (userId: string, title: string, description: string, totalQuestXp: number, id: string) => {
+  await createDocument('quests', { userId, title, description, totalQuestXp, status: 'active', createdAt: Timestamp.now(), completedAt: null, sidequestsIds: [] }, id);
+  const quest = await getDocument<QuestType>('quests', id);
+  if (!quest) {
+    throw new Error('Failed to create quest');
+  }
+  return quest;
+};
+
+export const createSidequest = async (questId: string, title: string, description: string, totalSidequestXp: number, orderIndex: number, id: string) => {
+  await createDocument('sidequests', { questId, title, description, totalSidequestXp, isCompleted: false, orderIndex }, id);
+  const sidequest = await getDocument<SidequestType>('sidequests', id);
+  if (!sidequest) {
+    throw new Error('Failed to create sidequest');
+  }
+  return sidequest;
+};
+
+export const getSidequestsByQuestId = async (questId: string): Promise<SidequestType[]> => {
+  return await queryDocuments<SidequestType>('sidequests', 'questId', '==', questId);
+};
+
+export const deleteSidequest = async (sidequestId: string, questId: string) => {
+  await deleteDocument('sidequests', sidequestId);
+  // Reorder remaining sidequests
+  const remaining = await getSidequestsByQuestId(questId);
+  const sorted = remaining.sort((a, b) => a.orderIndex - b.orderIndex);
+  await Promise.all(
+    sorted.map((sidequest, index) => 
+      updateDocument('sidequests', sidequest.id, { orderIndex: index })
+    )
+  );
+};
+
+export const completeSidequest = async (sidequestId: string) => {
+  const sidequest = await getDocument<SidequestType>('sidequests', sidequestId);
+  if (!sidequest) return;
+  
+  await updateDocument('sidequests', sidequestId, { isCompleted: true });
+  
+  // Award XP to user
+  const quest = await getDocument<QuestType>('quests', sidequest.questId);
+  if (quest) {
+    await addXp(quest.userId, sidequest.totalSidequestXp);
+  }
 };
 
 export const getQuests = async (userId: string): Promise<QuestType[]> => {
   return await queryDocuments<QuestType>('quests', 'userId', '==', userId);
 };
 
+export const getQuestById = async (questId: string): Promise<QuestType | null> => {
+  return await getDocument<QuestType>('quests', questId);
+};
+
 export const completeQuest = async (questId: string) => {
+  const quest = await getDocument<QuestType>('quests', questId);
+  if (!quest) return;
+  
   await updateDocument('quests', questId, { status: 'completed', completedAt: Timestamp.now() });
+  
+  // Award XP to user
+  await addXp(quest.userId, quest.totalQuestXp);
+};
+
+export const deleteQuest = async (questId: string) => {
+  await deleteDocument('quests', questId);
+};
+
+export const addSidequestToQuest = async (questId: string, sidequestId: string) => {
+  if (!questId) {
+    throw new Error('Quest ID is required to add sidequest');
+  }
+  const quest = await getDocument<QuestType>('quests', questId);
+  if (!quest) {
+    throw new Error(`Quest with ID "${questId}" not found`);
+  }
+  await updateDocument('quests', questId, { sidequestsIds: [...(quest.sidequestsIds ?? []), sidequestId] });
 };
 
 export default function useFirebase() {
@@ -188,5 +271,6 @@ export default function useFirebase() {
     deleteDocument,
     queryDocuments,
     completeQuest,
+    deleteQuest,
   }), [onAuthChange]);
 }
