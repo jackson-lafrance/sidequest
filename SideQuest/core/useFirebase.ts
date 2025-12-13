@@ -196,13 +196,31 @@ export const getSidequestsByQuestId = async (questId: string): Promise<Sidequest
 };
 
 export const deleteSidequest = async (sidequestId: string, questId: string) => {
+  const sidequest = await getDocument<SidequestType>('sidequests', sidequestId);
+  const quest = await getDocument<QuestType>('quests', questId);
+  
+  if (!sidequest || !quest) return;
+  
+  const allSidequests = await getSidequestsByQuestId(questId);
+  const totalSidequestXp = allSidequests.reduce((sum, s) => sum + s.totalSidequestXp, 0);
+  
+  if (totalSidequestXp > 0) {
+    const xpRatio = sidequest.totalSidequestXp / totalSidequestXp;
+    const xpReduction = Math.round(quest.totalQuestXp * xpRatio);
+    const newQuestXp = Math.max(0, quest.totalQuestXp - xpReduction);
+    await updateDocument('quests', questId, { totalQuestXp: newQuestXp });
+  }
+  
+  const updatedSidequestIds = quest.sidequestsIds.filter(id => id !== sidequestId);
+  await updateDocument('quests', questId, { sidequestsIds: updatedSidequestIds });
+  
   await deleteDocument('sidequests', sidequestId);
-  // Reorder remaining sidequests
+  
   const remaining = await getSidequestsByQuestId(questId);
   const sorted = remaining.sort((a, b) => a.orderIndex - b.orderIndex);
   await Promise.all(
-    sorted.map((sidequest, index) => 
-      updateDocument('sidequests', sidequest.id, { orderIndex: index })
+    sorted.map((sq, index) => 
+      updateDocument('sidequests', sq.id, { orderIndex: index })
     )
   );
 };
@@ -228,9 +246,23 @@ export const getQuestById = async (questId: string): Promise<QuestType | null> =
   return await getDocument<QuestType>('quests', questId);
 };
 
+export const canCompleteQuest = async (questId: string): Promise<boolean> => {
+  const sidequests = await getSidequestsByQuestId(questId);
+  return sidequests.length > 0 && sidequests.every(s => s.isCompleted);
+};
+
 export const completeQuest = async (questId: string) => {
   const quest = await getDocument<QuestType>('quests', questId);
   if (!quest) return;
+  
+  // Check if all sidequests are completed
+  const canComplete = await canCompleteQuest(questId);
+  
+  if (!canComplete) {
+    const sidequests = await getSidequestsByQuestId(questId);
+    const incomplete = sidequests.filter(s => !s.isCompleted).length;
+    throw new Error(`Cannot complete quest: ${incomplete} sidequest(s) remaining`);
+  }
   
   await updateDocument('quests', questId, { status: 'completed', completedAt: Timestamp.now() });
   
