@@ -20,15 +20,29 @@ import {
   addDoc,
 } from 'firebase/firestore';
 import { getFirebaseAuth, getFirestoreDb } from './firebase';
+import { Alert } from 'react-native';
 
-const signIn = async (email: string, password: string): Promise<UserCredential> => {
+
+const signIn = async (email: string, password: string): Promise<UserCredential | null> => {
   const auth = getFirebaseAuth();
-  return signInWithEmailAndPassword(auth, email, password);
+  try {
+    return await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    Alert.alert('Login failed', (error as Error).message);
+    return null;
+  }
 };
 
-export const signUp = async (email: string, password: string): Promise<UserCredential> => {
+export const signUp = async (email: string, password: string, displayName: string): Promise<UserCredential | null> => {
   const auth = getFirebaseAuth();
-  return createUserWithEmailAndPassword(auth, email, password);
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await createDocument('users', { email, displayName, createdAt: new Date(), level: 1, currentXp: 0, totalXp: 0 }, userCredential.user.uid);
+    return userCredential;
+  } catch (error) {
+    Alert.alert('Sign up failed', (error as Error).message);
+    return null;
+  }
 };
 
 export const logout = async (): Promise<void> => {
