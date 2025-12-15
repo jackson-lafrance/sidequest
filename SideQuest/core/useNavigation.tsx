@@ -6,20 +6,10 @@ import QuestDetails from '../views/Main/QuestDetails'
 import Profile from '../views/Main/Profile'
 import Settings from '../views/Main/Settings'
 import Login from '../views/Auth/Login'
+import { routes, RouteKey, RouteProps } from './routes'
 
-export type RouteKey = 'home' | 'createQuest' | 'createSidequest' | 'questDetails' | 'profile' | 'settings' | 'login'
-
-export type RouteProps = Record<string, any> | null
-
-export const routes: Record<RouteKey, RouteKey> = {
-    home: 'home',
-    createQuest: 'createQuest',
-    createSidequest: 'createSidequest',
-    questDetails: 'questDetails',
-    profile: 'profile',
-    settings: 'settings',
-    login: 'login',
-}
+// Re-export for convenience
+export { routes, RouteKey, RouteProps } from './routes'
 
 const routeComponents: Record<RouteKey, React.ComponentType<any>> = {
     home: Home,

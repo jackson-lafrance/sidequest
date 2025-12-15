@@ -2,7 +2,8 @@ import { QuestType, UserType, getCurrentUser, createSidequest, addSidequestToQue
 import { useEffect, useState } from "react";
 import { Text, TextInput, ScrollView, Alert, View, Pressable, StyleSheet } from "react-native";
 import * as Crypto from "expo-crypto";
-import { routes, useNavigation } from "@/core/useNavigation";
+import { routes } from "@/core/routes";
+import { useNavigation } from "@/core/useNavigation";
 import { colors, fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
 

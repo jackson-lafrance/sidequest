@@ -1,5 +1,6 @@
 import useFirebase, { signUp } from "@/core/useFirebase";
-import { routes, useNavigation } from "@/core/useNavigation";
+import { routes } from "@/core/routes";
+import { useNavigation } from "@/core/useNavigation";
 import { useEffect, useState } from "react";
 import { Text, TextInput, View, Pressable, StyleSheet, Image, KeyboardAvoidingView, Platform } from "react-native";
 import { fonts, spacing, borderRadius } from "@/core/theme";

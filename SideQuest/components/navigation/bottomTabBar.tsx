@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { RouteKey, RouteProps } from '../../core/useNavigation';
+import { RouteKey, RouteProps } from '../../core/routes';
 import { spacing } from '@/core/theme';
 import { useTheme } from '@/core/useTheme';
 

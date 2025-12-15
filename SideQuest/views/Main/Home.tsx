@@ -1,7 +1,8 @@
 import { Text, View, Pressable, ScrollView, StyleSheet, Image } from "react-native";
 import useFirebase, { QuestType, UserType, SidequestType, getQuests, getSidequestsByQuestId } from "@/core/useFirebase";
 import { useEffect, useState, useCallback } from "react";
-import { routes, useNavigation } from "@/core/useNavigation";
+import { routes } from "@/core/routes";
+import { useNavigation } from "@/core/useNavigation";
 import XpBar from "@/components/xpBar";
 import { fonts, spacing, borderRadius, shadows } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";

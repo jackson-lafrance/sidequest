@@ -1,5 +1,6 @@
 import useFirebase, { UserType } from "@/core/useFirebase";
-import { routes, useNavigation } from "@/core/useNavigation";
+import { routes } from "@/core/routes";
+import { useNavigation } from "@/core/useNavigation";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View, Pressable, StyleSheet } from "react-native";
 import usePrompt, { ConversationMessage } from "@/core/usePrompt";

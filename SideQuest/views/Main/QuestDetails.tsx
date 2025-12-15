@@ -1,6 +1,7 @@
 import useFirebase, { QuestType, SidequestType, deleteQuest, getSidequestsByQuestId, canCompleteQuest, getQuestById } from "@/core/useFirebase";
 import { Alert, FlatList, Text, View, Pressable, StyleSheet, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
-import { routes, useNavigation } from "@/core/useNavigation";
+import { routes } from "@/core/routes";
+import { useNavigation } from "@/core/useNavigation";
 import SidequestDetails from "./SidequestDetails";
 import { useCallback, useEffect, useState } from "react";
 import XpBar from "@/components/xpBar";
