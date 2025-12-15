@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
-import useFirebase, { UserType } from "@/core/useFirebase";
+import useFirebase, { UserType, QuestType, getQuests } from "@/core/useFirebase";
 import XpBar from "@/components/xpBar";
 import { colors, fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Profile() {
     const { getCurrentUser } = useFirebase();
     const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+    const [quests, setQuests] = useState<QuestType[]>([]);
 
     const refreshUser = useCallback(async () => {
         const user = await getCurrentUser();
@@ -17,6 +18,18 @@ export default function Profile() {
     useEffect(() => {
         refreshUser();
     }, [refreshUser]);
+
+    useEffect(() => {
+        if (!currentUser) return;
+        const fetchQuests = async () => {
+            const userQuests = await getQuests(currentUser.id);
+            setQuests(userQuests);
+        };
+        fetchQuests();
+    }, [currentUser]);
+
+    const activeQuests = quests.filter(q => q.status === 'active');
+    const completedQuests = quests.filter(q => q.status === 'completed');
 
     if (!currentUser) {
         return (
@@ -72,21 +85,21 @@ export default function Profile() {
                     
                     <View style={styles.statsGrid}>
                         <View style={styles.statCard}>
-                            <Ionicons name="star" size={24} color={colors.gold} />
-                            <Text style={styles.statValue}>{currentUser.level}</Text>
-                            <Text style={styles.statLabel}>Level</Text>
+                            <Ionicons name="trophy" size={24} color={colors.gold} />
+                            <Text style={styles.statValue}>{completedQuests.length}</Text>
+                            <Text style={styles.statLabel}>Completed</Text>
                         </View>
                         
                         <View style={styles.statCard}>
-                            <Ionicons name="flash" size={24} color={colors.accent} />
-                            <Text style={styles.statValue}>{currentUser.currentXp}</Text>
-                            <Text style={styles.statLabel}>Current XP</Text>
+                            <Ionicons name="flame" size={24} color={colors.accent} />
+                            <Text style={styles.statValue}>{activeQuests.length}</Text>
+                            <Text style={styles.statLabel}>Active</Text>
                         </View>
                         
                         <View style={styles.statCard}>
-                            <Ionicons name="trending-up" size={24} color={colors.success} />
-                            <Text style={styles.statValue}>{currentUser.level * 100}</Text>
-                            <Text style={styles.statLabel}>Next Level</Text>
+                            <Ionicons name="arrow-up-circle" size={24} color={colors.success} />
+                            <Text style={styles.statValue}>{(currentUser.level * 100) - currentUser.currentXp}</Text>
+                            <Text style={styles.statLabel}>XP to Level</Text>
                         </View>
                     </View>
                 </View>
