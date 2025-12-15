@@ -2,15 +2,18 @@ import useFirebase, { signUp } from "@/core/useFirebase";
 import { routes, useNavigation } from "@/core/useNavigation";
 import { useEffect, useState } from "react";
 import { Text, TextInput, View, Pressable, StyleSheet, Image, KeyboardAvoidingView, Platform } from "react-native";
-import { colors, fonts, spacing, borderRadius } from "@/core/theme";
+import { fonts, spacing, borderRadius } from "@/core/theme";
+import { useTheme } from "@/core/useTheme";
 
 export default function Login() {
+    const { colors } = useTheme();
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginOrSignup, setLoginOrSignup] = useState<'login' | 'signup'>('login');
     const { signIn, onAuthChange } = useFirebase();
     const { setRoute } = useNavigation();
+    const styles = createStyles(colors);
 
     useEffect(() => {
         const unsubscribe = onAuthChange((user) => {
@@ -118,7 +121,7 @@ export default function Login() {
     )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,

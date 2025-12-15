@@ -2,13 +2,16 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ScrollView, Text, View, StyleSheet, Image } from "react-native";
 import useFirebase, { UserType, QuestType, getQuests } from "@/core/useFirebase";
 import XpBar from "@/components/xpBar";
-import { colors, fonts, spacing, borderRadius } from "@/core/theme";
+import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/core/useTheme";
 
 export default function Profile() {
+    const { colors } = useTheme();
     const { getCurrentUser } = useFirebase();
     const [currentUser, setCurrentUser] = useState<UserType | null>(null);
     const [quests, setQuests] = useState<QuestType[]>([]);
+    const styles = createStyles(colors);
 
     const refreshUser = useCallback(async () => {
         const user = await getCurrentUser();
@@ -143,7 +146,7 @@ export default function Profile() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
@@ -166,7 +169,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
     header: {
-        backgroundColor: '#2D2254',
+        backgroundColor: colors.headerBackground,
         paddingTop: spacing.xxl + 20,
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.md,

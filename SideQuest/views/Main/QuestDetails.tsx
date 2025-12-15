@@ -4,20 +4,23 @@ import { routes, useNavigation } from "@/core/useNavigation";
 import SidequestDetails from "./SidequestDetails";
 import { useCallback, useEffect, useState } from "react";
 import XpBar from "@/components/xpBar";
-import { colors, fonts, spacing, borderRadius } from "@/core/theme";
+import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
 import usePrompt from "@/core/usePrompt";
+import { useTheme } from "@/core/useTheme";
 
 interface Props {
     quest: QuestType;
 }
 
 export default function QuestDetails({ quest: initialQuest }: Props) {
+    const { colors } = useTheme();
     const { completeQuest } = useFirebase();
     const { setRoute } = useNavigation();
     const { updateQuestWithAI, loading: aiLoading } = usePrompt();
     const [quest, setQuest] = useState<QuestType | null>(initialQuest);
     const [sidequests, setSidequests] = useState<SidequestType[]>([]);
+    const styles = createStyles(colors);
     const [canComplete, setCanComplete] = useState(false);
     const [updatePrompt, setUpdatePrompt] = useState('');
 
@@ -258,13 +261,13 @@ export default function QuestDetails({ quest: initialQuest }: Props) {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
     },
     header: {
-        backgroundColor: '#2D2254',
+        backgroundColor: colors.headerBackground,
         paddingTop: spacing.xxl + 20,
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.md,

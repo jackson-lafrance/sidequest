@@ -2,7 +2,8 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteKey, RouteProps } from '../../core/useNavigation';
-import { colors, spacing } from '@/core/theme';
+import { spacing } from '@/core/theme';
+import { useTheme } from '@/core/useTheme';
 
 interface Props {
     tabs: {
@@ -14,6 +15,9 @@ interface Props {
 }
 
 export default function BottomTabBar({ tabs, setRoute, route }: Props) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
+
     return (
         <View style={styles.container}>
             {tabs.map((tab, index) => {
@@ -36,7 +40,7 @@ export default function BottomTabBar({ tabs, setRoute, route }: Props) {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         backgroundColor: colors.backgroundDark,

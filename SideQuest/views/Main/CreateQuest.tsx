@@ -3,18 +3,21 @@ import { routes, useNavigation } from "@/core/useNavigation";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, View, Pressable, StyleSheet } from "react-native";
 import usePrompt, { ConversationMessage } from "@/core/usePrompt";
-import { colors, fonts, spacing, borderRadius } from "@/core/theme";
+import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/core/useTheme";
 
 type ConversationState = 'initial' | 'asking' | 'complete';
 
 export default function CreateQuest() {
+    const { colors } = useTheme();
     const { getCurrentUser } = useFirebase();
     const { setRoute } = useNavigation();
     const { startQuestConversation, continueQuestConversation, finalizeQuest, loading: aiLoading } = usePrompt();
     
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const styles = createStyles(colors);
     const [currentUser, setCurrentUser] = useState<UserType | null>(null);
     
     // Conversation state
@@ -240,13 +243,13 @@ export default function CreateQuest() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
     },
     header: {
-        backgroundColor: '#2D2254',
+        backgroundColor: colors.headerBackground,
         paddingTop: spacing.xxl + 20,
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.md,

@@ -3,19 +3,22 @@ import useFirebase, { QuestType, UserType, SidequestType, getQuests, getSideques
 import { useEffect, useState, useCallback } from "react";
 import { routes, useNavigation } from "@/core/useNavigation";
 import XpBar from "@/components/xpBar";
-import { colors, fonts, spacing, borderRadius, shadows } from "@/core/theme";
+import { fonts, spacing, borderRadius, shadows } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/core/useTheme";
 
 interface QuestWithSidequests extends QuestType {
     sidequests: SidequestType[];
 }
 
 export default function Home() {
+    const { colors } = useTheme();
     const { getCurrentUser } = useFirebase();
     const { setRoute } = useNavigation();
     const [currentUser, setCurrentUser] = useState<UserType | null>(null);
     const [questsWithSidequests, setQuestsWithSidequests] = useState<QuestWithSidequests[]>([]);
     const [showCompleted, setShowCompleted] = useState(false);
+    const styles = createStyles(colors);
 
     const refreshUser = useCallback(async () => {
         const user = await getCurrentUser();
@@ -207,7 +210,7 @@ export default function Home() {
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
     
     // Fixed Header
     header: {
-        backgroundColor: '#2D2254',
+        backgroundColor: colors.headerBackground,
         paddingTop: spacing.xxl + 20,
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.md,

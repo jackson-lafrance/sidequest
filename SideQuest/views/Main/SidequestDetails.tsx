@@ -1,7 +1,8 @@
 import { SidequestType, completeSidequest, deleteSidequest } from "@/core/useFirebase";
 import { Text, View, Pressable, StyleSheet, Alert } from "react-native";
-import { colors, fonts, spacing, borderRadius } from "@/core/theme";
+import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/core/useTheme";
 
 interface Props {
     sidequest: SidequestType;
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export default function SidequestDetails({ sidequest, isFirst, onUpdate, onQuestCompleted, questStatus }: Props) {
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
 
     const handleCompleteSidequest = async () => {   
         if (!sidequest) return;
@@ -99,7 +102,7 @@ export default function SidequestDetails({ sidequest, isFirst, onUpdate, onQuest
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: typeof import('@/core/useTheme').darkColors) => StyleSheet.create({
     container: {
         backgroundColor: colors.cardBackground,
         borderRadius: borderRadius.md,
