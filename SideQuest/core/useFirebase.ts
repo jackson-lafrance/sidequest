@@ -225,17 +225,30 @@ export const deleteSidequest = async (sidequestId: string, questId: string) => {
   );
 };
 
-export const completeSidequest = async (sidequestId: string) => {
+export const completeSidequest = async (sidequestId: string): Promise<{ questCompleted: boolean }> => {
   const sidequest = await getDocument<SidequestType>('sidequests', sidequestId);
-  if (!sidequest) return;
+  if (!sidequest) return { questCompleted: false };
   
   await updateDocument('sidequests', sidequestId, { isCompleted: true });
   
-  // Award XP to user
+  // Award sidequest XP to user
   const quest = await getDocument<QuestType>('quests', sidequest.questId);
   if (quest) {
     await addXp(quest.userId, sidequest.totalSidequestXp);
+    
+    // Check if all sidequests are now completed
+    const allSidequests = await getSidequestsByQuestId(sidequest.questId);
+    const allCompleted = allSidequests.every(s => s.isCompleted);
+    
+    if (allCompleted && quest.status === 'active') {
+      // Auto-complete the quest
+      await updateDocument('quests', sidequest.questId, { status: 'completed', completedAt: Timestamp.now() });
+      await addXp(quest.userId, quest.totalQuestXp);
+      return { questCompleted: true };
+    }
   }
+  
+  return { questCompleted: false };
 };
 
 export const getQuests = async (userId: string): Promise<QuestType[]> => {
@@ -272,6 +285,17 @@ export const completeQuest = async (questId: string) => {
 
 export const deleteQuest = async (questId: string) => {
   await deleteDocument('quests', questId);
+};
+
+export const updateQuestDetails = async (questId: string, title: string, description: string, totalQuestXp: number) => {
+  await updateDocument('quests', questId, { title, description, totalQuestXp });
+  return await getDocument<QuestType>('quests', questId);
+};
+
+export const deleteAllSidequestsForQuest = async (questId: string) => {
+  const sidequests = await getSidequestsByQuestId(questId);
+  await Promise.all(sidequests.map(sq => deleteDocument('sidequests', sq.id)));
+  await updateDocument('quests', questId, { sidequestsIds: [] });
 };
 
 export const addSidequestToQuest = async (questId: string, sidequestId: string) => {

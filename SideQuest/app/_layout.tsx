@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
+import { View, StatusBar } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import NavigationProvider from "../core/useNavigation";
 import { Slot } from "expo-router";
 import { initializeFirebase } from "../core/firebase";
-
+import { colors } from "@/core/theme";
 
 try {
   initializeFirebase();
@@ -20,9 +22,13 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <NavigationProvider>
-      <Slot />
-    </NavigationProvider>
+    <SafeAreaProvider>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+        <NavigationProvider>
+          <Slot />
+        </NavigationProvider>
+      </View>
+    </SafeAreaProvider>
   );
 }
-

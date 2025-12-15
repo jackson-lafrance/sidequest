@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteKey, RouteProps } from '../../core/useNavigation';
+import { colors, spacing } from '@/core/theme';
 
 interface Props {
     tabs: {
@@ -16,6 +17,7 @@ export default function BottomTabBar({ tabs, setRoute, route }: Props) {
     return (
         <View style={styles.container}>
             {tabs.map((tab, index) => {
+                const isActive = route === tab.route;
                 return (
                     <Pressable
                         key={index} 
@@ -25,7 +27,7 @@ export default function BottomTabBar({ tabs, setRoute, route }: Props) {
                         <Ionicons
                             name={tab.icon}
                             size={24}
-                            color={route === tab.route ? '#007AFF' : '#8E8E93'}
+                            color={isActive ? colors.gold : colors.textMuted}
                         />                        
                     </Pressable>
                 );
@@ -37,18 +39,16 @@ export default function BottomTabBar({ tabs, setRoute, route }: Props) {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.backgroundDark,
         borderTopWidth: 1,
-        borderTopColor: '#E5E5EA',
-        paddingBottom: 8,
-        paddingTop: 8,
-        elevation: 5,
+        borderTopColor: colors.border,
+        paddingBottom: spacing.lg,
+        paddingTop: spacing.sm,
     },
     tab: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 8,
+        paddingVertical: spacing.sm,
     },
 });
-
