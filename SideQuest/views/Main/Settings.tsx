@@ -4,11 +4,34 @@ import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTheme } from "@/core/useTheme";
+import { useNotifications } from "@/core/useNotifications";
 
 export default function Settings() {
     const { colors, mode, toggleTheme } = useTheme();
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+    const { notificationsEnabled, setNotificationsEnabled, scheduleDailyReminder, cancelAllNotifications, requestPermissions } = useNotifications();
+    const [reminderTime, setReminderTime] = useState({ hour: 9, minute: 0 });
     const styles = createStyles(colors);
+
+    const handleToggleNotifications = async (enabled: boolean) => {
+        if (enabled) {
+            const granted = await requestPermissions();
+            if (!granted) {
+                Alert.alert(
+                    'Permissions Required',
+                    'Please enable notifications in your device settings to receive quest reminders.',
+                    [{ text: 'OK' }]
+                );
+                return;
+            }
+            await setNotificationsEnabled(true);
+            // Schedule daily reminder at 9 AM by default
+            await scheduleDailyReminder(reminderTime.hour, reminderTime.minute);
+            Alert.alert('Notifications Enabled', 'You\'ll receive daily reminders at 9:00 AM to work on your quests!');
+        } else {
+            await setNotificationsEnabled(false);
+            await cancelAllNotifications();
+        }
+    };
 
     const handleLogout = async () => {
         Alert.alert(
@@ -94,11 +117,14 @@ export default function Settings() {
                                 <View style={[styles.iconContainer, { backgroundColor: colors.primary + '30' }]}>
                                     <Ionicons name="notifications-outline" size={20} color={colors.primary} />
                                 </View>
-                                <Text style={styles.settingLabel}>Push Notifications</Text>
+                                <View>
+                                    <Text style={styles.settingLabel}>Daily Reminders</Text>
+                                    <Text style={styles.settingSubtext}>9:00 AM daily</Text>
+                                </View>
                             </View>
                             <Switch
                                 value={notificationsEnabled}
-                                onValueChange={setNotificationsEnabled}
+                                onValueChange={handleToggleNotifications}
                                 trackColor={{ false: colors.border, true: colors.gold + '60' }}
                                 thumbColor={notificationsEnabled ? colors.gold : colors.textMuted}
                             />

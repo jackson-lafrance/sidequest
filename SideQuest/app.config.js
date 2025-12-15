@@ -12,6 +12,9 @@ module.exports = {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      infoPlist: {
+        UIBackgroundModes: ['remote-notification'],
+      },
     },
     android: {
       adaptiveIcon: {
@@ -22,6 +25,7 @@ module.exports = {
       },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
+      useNextNotificationsApi: true,
     },
     web: {
       output: 'static',
@@ -39,6 +43,14 @@ module.exports = {
           dark: {
             backgroundColor: '#000000',
           },
+        },
+      ],
+      [
+        'expo-notifications',
+        {
+          icon: './assets/images/icon.png',
+          color: '#D4A84B',
+          sounds: [],
         },
       ],
     ],

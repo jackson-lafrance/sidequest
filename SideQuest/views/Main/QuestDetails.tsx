@@ -8,6 +8,7 @@ import { fonts, spacing, borderRadius } from "@/core/theme";
 import { Ionicons } from "@expo/vector-icons";
 import usePrompt from "@/core/usePrompt";
 import { useTheme } from "@/core/useTheme";
+import { useNotifications } from "@/core/useNotifications";
 
 interface Props {
     quest: QuestType;
@@ -18,6 +19,7 @@ export default function QuestDetails({ quest: initialQuest }: Props) {
     const { completeQuest } = useFirebase();
     const { setRoute } = useNavigation();
     const { updateQuestWithAI, loading: aiLoading } = usePrompt();
+    const { sendLocalNotification } = useNotifications();
     const [quest, setQuest] = useState<QuestType | null>(initialQuest);
     const [sidequests, setSidequests] = useState<SidequestType[]>([]);
     const styles = createStyles(colors);
@@ -49,7 +51,13 @@ export default function QuestDetails({ quest: initialQuest }: Props) {
         }
     };
 
-    const handleQuestAutoCompleted = () => {
+    const handleQuestAutoCompleted = async () => {
+        // Send a celebratory notification
+        await sendLocalNotification(
+            '🎉 Quest Complete!',
+            `You finished "${quest?.title}"! Keep up the great work, adventurer!`
+        );
+        
         Alert.alert(
             '🎉 Quest Complete!',
             'Congratulations! You\'ve completed all sidequests and finished this quest!',
